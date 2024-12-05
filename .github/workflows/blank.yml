@@ -21,12 +21,15 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Sync folder1 to S3 bucket1
-      if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'codepipeline-us-east-1-953043602735/') }}
       run: |
-        aws s3 sync ./codepipeline-us-east-1-953043602735 s3://codepipeline-us-east-1-953043602735 --delete
+        echo "Checking for changes in folder1..."
+        git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^codepipeline-us-east-1-953043602735/' && \
+        aws s3 sync ./codepipeline-us-east-1-953043602735 s3://codepipeline-us-east-1-953043602735 --delete || \
+        echo "No changes in folder1, skipping sync."
 
     - name: Sync folder2 to S3 bucket2
-      if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'perimattic-task-cloudfront-s3/') }}
       run: |
-        aws s3 sync ./perimattic-task-cloudfront-s3 s3://perimattic-task-cloudfront-s3 --delete
-
+        echo "Checking for changes in folder2..."
+        git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^perimattic-task-cloudfront-s3/' && \
+        aws s3 sync ./perimattic-task-cloudfront-s3 s3://perimattic-task-cloudfront-s3 --delete || \
+        echo "No changes in folder2, skipping sync."
