@@ -26,12 +26,12 @@ jobs:
       run: |
         echo "Checking for changes in folder1..."
         git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^codepipeline-us-east-1-953043602735/' && \
-        aws s3 sync ./codepipeline-us-east-1-953043602735 s3://codepipeline-us-east-1-953043602735 --delete || \
+        aws s3 sync ./codepipeline-us-east-1-953043602735 s3://codepipeline-us-east-1-953043602735 --delete --sse aws:kms || \
         echo "No changes in folder1, skipping sync."
 
     - name: Sync folder2 to S3 bucket2
       run: |
         echo "Checking for changes in folder2..."
         git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^perimattic-task-cloudfront-s3/' && \
-        aws s3 sync ./perimattic-task-cloudfront-s3 s3://perimattic-task-cloudfront-s3 --delete || \
+        aws s3 sync ./perimattic-task-cloudfront-s3 s3://perimattic-task-cloudfront-s3 --delete --sse aws:kms || \
         echo "No changes in folder2, skipping sync."
