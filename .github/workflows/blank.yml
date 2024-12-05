@@ -1,0 +1,32 @@
+name: Sync Folder to S3
+
+on:
+  push:
+    paths:
+      - "codepipeline-us-east-1-953043602735/**"
+      - "perimattic-task-cloudfront-s3/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Sync folder1 to S3 bucket1
+      if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'codepipeline-us-east-1-953043602735/') }}
+      run: |
+        aws s3 sync ./codepipeline-us-east-1-953043602735 s3://codepipeline-us-east-1-953043602735 --delete
+
+    - name: Sync folder2 to S3 bucket2
+      if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'perimattic-task-cloudfront-s3/') }}
+      run: |
+        aws s3 sync ./perimattic-task-cloudfront-s3 s3://perimattic-task-cloudfront-s3 --delete
+
